@@ -19,6 +19,7 @@ public:
     ~UdpSocket();
 
     bool Init(string host="", int port=0);
+    void SetDest(string ip, int port);
     int RecvFrom(char * buf, int len);
     int SendTo(char * buf, int len, const char * addr, int port);
     int Send(char * buf, int len);

@@ -44,6 +44,21 @@ bool UdpSocket::Init(string host, int port)
     }
 }
 
+void UdpSocket::SetDest(string ip, int port)
+{
+    if (ip == "")
+        return;
+    if (port <= 0)
+        return;
+
+    bzero(&m_DestAddr, sizeof(m_DestAddr));
+    m_DestAddr.sin_family = AF_INET;
+    m_DestAddr.sin_addr.s_addr = inet_addr(ip.c_str());
+    m_DestAddr.sin_port = htons(port);
+    socklen_t socketlen = sizeof(m_DestAddr);
+
+}
+
 int UdpSocket::RecvFrom(char * buf, int len)
 {
     socklen_t socklen = sizeof(m_ClientAddr);
