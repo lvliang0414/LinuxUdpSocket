@@ -42,6 +42,7 @@ bool UdpSocket::Init(string host, int port)
         printf("Bind filed!\n");
         return false;
     }
+    return true;
 }
 
 void UdpSocket::SetDest(string ip, int port)
