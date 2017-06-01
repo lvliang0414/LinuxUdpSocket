@@ -1,6 +1,7 @@
 #ifndef _LINUX_UDP_SOCKET_UDP_SOCKET_H_
 #define _LINUX_UDP_SOCKET_UDP_SOCKET_H_
 
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -24,9 +25,10 @@ public:
     int SendTo(char * buf, int len, const char * addr, int port);
     int Send(char * buf, int len);
     int SendAnswer(char * buf, int len);
-
+    void SetTimeout(int ms);
 private:
     int m_Socket;
+    int m_timeoutms;
     socklen_t m_SocketLen;
     struct sockaddr_in  m_ServerAddr;
     struct sockaddr_in  m_ClientAddr;

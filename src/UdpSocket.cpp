@@ -8,7 +8,7 @@ UdpSocket::UdpSocket()
     bzero(&m_ServerAddr, sizeof(m_ServerAddr));
     bzero(&m_ClientAddr, sizeof(m_ClientAddr));
     bzero(&m_DestAddr, sizeof(m_DestAddr));
-
+    m_timeoutms = 3000;
 }
 
 UdpSocket::~UdpSocket()
@@ -60,11 +60,43 @@ void UdpSocket::SetDest(string ip, int port)
 
 }
 
+void UdpSocket::SetTimeout(int ms)
+{
+    m_timeoutms = ms;
+}
+
 int UdpSocket::RecvFrom(char * buf, int len)
 {
     socklen_t socklen = sizeof(m_ClientAddr);
 
-    int size = recvfrom(m_Socket, buf, len, 0, (struct sockaddr*)&m_ClientAddr, &socklen);
+    int size = 0;
+    if (m_timeoutms <= 0) {
+        size = recvfrom(m_Socket, buf, len, 0, (struct sockaddr*)&m_ClientAddr, &socklen);
+    }
+    else {
+        fd_set fds;
+        struct timeval tv;
+        tv.tv_sec = m_timeoutms / 1000;
+        tv.tv_usec = m_timeoutms % 1000;
+
+        int maxsock = m_Socket;
+
+        FD_ZERO(&fds);
+        FD_SET(m_Socket, &fds);
+
+        int ret = select(maxsock + 1, &fds, NULL, NULL, &tv);
+        if (ret == -1) {
+            perror("select()");
+        }
+        else if (ret == 0) {
+            //printf("select timeout\n");
+        }
+        else {
+            if (FD_ISSET(m_Socket, &fds)) {
+                size = recvfrom(m_Socket, buf, len, 0, (struct sockaddr*)&m_ClientAddr, &socklen);
+            }
+        }
+    }
 
     return size;
 }
